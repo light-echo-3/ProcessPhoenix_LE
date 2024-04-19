@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Process;
 import android.os.StrictMode;
+import android.util.Log;
 
 /**
  * Please note that restarting a Service multiple times can result in an increasingly long delay between restart times.
@@ -25,8 +26,10 @@ public final class PhoenixService extends IntentService {
       return;
     }
 
-    Process.killProcess(
-        intent.getIntExtra(ProcessPhoenix.KEY_MAIN_PROCESS_PID, -1)); // Kill original main process
+    int toKilledPid = intent.getIntExtra(ProcessPhoenix.KEY_MAIN_PROCESS_PID, -1);
+    int currentPid = Process.myPid();
+    Log.d("hdq---", "kill process---service: toKilledPid=" + toKilledPid + ",currentPid=" + currentPid);
+    Process.killProcess(toKilledPid); // Kill original main process
 
     Intent nextIntent;
     if (Build.VERSION.SDK_INT >= 33) {
@@ -50,6 +53,7 @@ public final class PhoenixService extends IntentService {
       startService(nextIntent);
     }
 
+    Log.d("hdq---", "退出当前process---service: toKilledPid=" + toKilledPid + ",currentPid=" + currentPid);
     Runtime.getRuntime().exit(0); // Kill kill kill!
   }
 }
